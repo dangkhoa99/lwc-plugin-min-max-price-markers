@@ -1,10 +1,36 @@
 # Min Max Price Markers - Lightweight Charts™ Plugin
 
-Description of the Plugin.
+A plugin to display min/max prices Markers.
 
-- Developed for Lightweight Charts version: `v5.0.0`
+- Developed for Lightweight Charts version: `v5.0.9`
 
-## Running Locally
+## Installation
+
+```bash
+npm install lwc-plugin-min-max-price-markers
+```
+
+## Usage
+
+```js
+import { MinMaxPriceMarkers } from 'lwc-plugin-min-max-price-markers';
+
+// Create the chart and series...
+const chart = createChart(document.getElementById('container'));
+const lineSeries = chart.addLineSeries();
+const data = [
+  { time: 1642425322, value: 123 },
+  /* ... more data */
+];
+
+// Attach the utility to the series
+const minMaxPriceMarkers = new MinMaxPriceMarkers();
+lineSeries.attachPrimitive(minMaxPriceMarkers);
+```
+
+## Developing
+
+### Running Locally
 
 ```shell
 npm install
@@ -13,26 +39,10 @@ npm run dev
 
 Visit `localhost:5173` in the browser.
 
-## Compiling
+### Compiling
 
 ```shell
 npm run compile
 ```
 
 Check the output in the `dist` folder.
-
-## Publishing To NPM
-
-You can configure the contents of the package's `package.json` within the
-`compile.mjs` script.
-
-Once you have compiled the plugin (see above section) then you can publish the
-package to NPM with these commands:
-
-```shell
-cd dist
-npm publish
-```
-
-Hint: append `--dry-run` to the end of the publish command to see the results of
-the publish command without actually uploading the package to NPM.
