@@ -5,28 +5,42 @@ import { fileURLToPath } from 'url';
 import { generateDtsBundle } from 'dts-bundle-generator';
 
 function buildPackageJson(packageName) {
-	/*
+  /*
 	 Define the contents of the package's package.json here.
 	 */
-	return {
-		name: packageName,
-		version: '1.0.0',
-		keywords: ['lwc-plugin', 'lightweight-charts'],
-		type: 'module',
-		main: `./${packageName}.umd.cjs`,
-		module: `./${packageName}.js`,
-		types: `./${packageName}.d.ts`,
-		exports: {
-			import: {
-				types: `./${packageName}.d.ts`,
-				default: `./${packageName}.js`,
-			},
-			require: {
-				types: `./${packageName}.d.cts`,
-				default: `./${packageName}.umd.cjs`,
-			},
-		},
-	};
+  return {
+    name: packageName,
+    version: '1.0.0',
+    description: 'A plugin to display min/max prices Markers.',
+    keywords: ['lwc-plugin', 'lightweight-charts'],
+    type: 'module',
+    main: `./${packageName}.umd.cjs`,
+    module: `./${packageName}.js`,
+    types: `./${packageName}.d.ts`,
+    exports: {
+      import: {
+        types: `./${packageName}.d.ts`,
+        default: `./${packageName}.js`,
+      },
+      require: {
+        types: `./${packageName}.d.cts`,
+        default: `./${packageName}.umd.cjs`,
+      },
+    },
+    repository: {
+      type: 'git',
+      url: 'git+https://github.com/dangkhoa99/lwc-plugin-min-max-price-markers.git',
+    },
+    author: 'Khoa Nguyen <nguyenminhdangkhoa9@gmail.com>',
+    bugs: {
+      url: 'https://github.com/dangkhoa99/lwc-plugin-min-max-price-markers/issues',
+    },
+    homepage:
+      'https://github.com/dangkhoa99/lwc-plugin-min-max-price-markers/wiki',
+    publishConfig: {
+      access: 'public',
+    },
+  };
 }
 
 const __filename = fileURLToPath(import.meta.url);
@@ -36,81 +50,84 @@ const pluginFileName = 'min-max-price-markers';
 const pluginFile = resolve(currentDir, 'src', `${pluginFileName}.ts`);
 
 const pluginsToBuild = [
-	{
-		filepath: pluginFile,
-		exportName: 'lwc-plugin-min-max-price-markers',
-		name: 'MinMaxPriceMarkers',
-	},
+  {
+    filepath: pluginFile,
+    exportName: 'lwc-plugin-min-max-price-markers',
+    name: 'MinMaxPriceMarkers',
+  },
 ];
 
 const compiledFolder = resolve(currentDir, 'dist');
 if (!existsSync(compiledFolder)) {
-	mkdirSync(compiledFolder);
+  mkdirSync(compiledFolder);
 }
 
 const buildConfig = ({
-	filepath,
-	name,
-	exportName,
-	formats = ['es', 'umd'],
+  filepath,
+  name,
+  exportName,
+  formats = ['es', 'umd'],
 }) => {
-	return defineConfig({
-		publicDir: false,
-		build: {
-			outDir: `dist`,
-			emptyOutDir: true,
-			copyPublicDir: false,
-			lib: {
-				entry: filepath,
-				name,
-				formats,
-				fileName: exportName,
-			},
-			rollupOptions: {
-				external: ['lightweight-charts', 'fancy-canvas'],
-				output: {
-					globals: {
-						'lightweight-charts': 'LightweightCharts',
-					},
-				},
-			},
-		},
-	});
+  return defineConfig({
+    publicDir: false,
+    build: {
+      outDir: `dist`,
+      emptyOutDir: true,
+      copyPublicDir: false,
+      lib: {
+        entry: filepath,
+        name,
+        formats,
+        fileName: exportName,
+      },
+      rollupOptions: {
+        external: ['lightweight-charts', 'fancy-canvas'],
+        output: {
+          globals: {
+            'lightweight-charts': 'LightweightCharts',
+          },
+        },
+      },
+    },
+  });
 };
 
 const startTime = Date.now().valueOf();
 console.log('⚡️ Starting');
 console.log('Bundling the plugin...');
 const promises = pluginsToBuild.map(file => {
-	return build(buildConfig(file));
+  return build(buildConfig(file));
 });
 await Promise.all(promises);
 console.log('Generating the package.json file...');
 pluginsToBuild.forEach(file => {
-	const packagePath = resolve(compiledFolder, 'package.json');
-	const content = JSON.stringify(
-		buildPackageJson(file.exportName),
-		undefined,
-		4
-	);
-	writeFileSync(packagePath, content, { encoding: 'utf-8' });
+  const packagePath = resolve(compiledFolder, 'package.json');
+  const content = JSON.stringify(
+    buildPackageJson(file.exportName),
+    undefined,
+    4,
+  );
+  writeFileSync(packagePath, content, { encoding: 'utf-8' });
 });
 console.log('Generating the typings files...');
 pluginsToBuild.forEach(file => {
-	try {
-		const esModuleTyping = generateDtsBundle([
-			{
-				filePath: `./typings/${pluginFileName}.d.ts`,
-			},
-		]);
-		const typingFilePath = resolve(compiledFolder, `${file.exportName}.d.ts`);
-		writeFileSync(typingFilePath, esModuleTyping.join('\n'), {
-			encoding: 'utf-8',
-		});
-		copyFileSync(typingFilePath, resolve(compiledFolder, `${file.exportName}.d.cts`));
-	} catch (e) {
-		console.error('Error generating typings for: ', file.exportName);
-	}
+  try {
+    const esModuleTyping = generateDtsBundle([
+      {
+        filePath: `./typings/${pluginFileName}.d.ts`,
+      },
+    ]);
+    const typingFilePath = resolve(compiledFolder, `${file.exportName}.d.ts`);
+    writeFileSync(typingFilePath, esModuleTyping.join('\n'), {
+      encoding: 'utf-8',
+    });
+    copyFileSync(
+      typingFilePath,
+      resolve(compiledFolder, `${file.exportName}.d.cts`),
+    );
+  } catch (e) {
+    console.error('Error generating typings for: ', file.exportName);
+  }
 });
 const endTime = Date.now().valueOf();
 console.log(`🎉 Done (${endTime - startTime}ms)`);
