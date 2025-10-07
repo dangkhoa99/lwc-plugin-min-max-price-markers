@@ -10,7 +10,7 @@ function buildPackageJson(packageName) {
 	 */
   return {
     name: packageName,
-    version: '1.0.1',
+    version: '1.0.2',
     description: 'A plugin to display min/max prices Markers.',
     keywords: ['lwc-plugin', 'lightweight-charts'],
     type: 'module',
@@ -129,5 +129,9 @@ pluginsToBuild.forEach(file => {
     console.error('Error generating typings for: ', file.exportName);
   }
 });
+copyFileSync(
+  resolve(currentDir, 'README.md'),
+  resolve(compiledFolder, `README.md`),
+);
 const endTime = Date.now().valueOf();
 console.log(`🎉 Done (${endTime - startTime}ms)`);
