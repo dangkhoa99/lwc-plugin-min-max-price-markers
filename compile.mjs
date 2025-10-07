@@ -10,7 +10,7 @@ function buildPackageJson(packageName) {
 	 */
   return {
     name: packageName,
-    version: '1.0.0',
+    version: '1.0.1',
     description: 'A plugin to display min/max prices Markers.',
     keywords: ['lwc-plugin', 'lightweight-charts'],
     type: 'module',
